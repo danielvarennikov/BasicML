@@ -52,11 +52,11 @@ df['label'] = df[forecast_col].shift(-forecast_out)
 # features: x, labels: y
 X = np.array(df.drop(['label'], 1))
 X = preprocessing.scale(X)
-
-X = X[:-forecast_out]
-
 # the predicted values
 X_lately = X[-forecast_out:]
+# up to 90 percent
+X = X[:-forecast_out]
+
 
 df.dropna(inplace=True)
 Y = np.array(df['label'])
