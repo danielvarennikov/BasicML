@@ -65,63 +65,6 @@ class LTSM:
 
         return x_scaled, y, mu_list, std_list
 
-    def train_pred_eval_model(self, x_train_scaled, \
-                              y_train_scaled, \
-                              x_cv_scaled, \
-                              y_cv, \
-                              mu_cv_list, \
-                              std_cv_list, \
-                              lstm_units=50, \
-                              dropout_prob=0.5, \
-                              optimizer='adam', \
-                              epochs=1, \
-                              batch_size=1):
-        '''
-        Train model, do prediction, scale back to original range and do evaluation
-        Use LSTM here.
-        Returns rmse, mape and predicted values
-        Inputs
-            x_train_scaled  : e.g. x_train_scaled.shape=(451, 9, 1). Here we are using the past 9 values to predict the next value
-            y_train_scaled  : e.g. y_train_scaled.shape=(451, 1)
-            x_cv_scaled     : use this to do predictions
-            y_cv            : actual value of the predictions
-            mu_cv_list      : list of the means. Same length as x_scaled and y
-            std_cv_list     : list of the std devs. Same length as x_scaled and y
-            lstm_units      : lstm param
-            dropout_prob    : lstm param
-            optimizer       : lstm param
-            epochs          : lstm param
-            batch_size      : lstm param
-        Outputs
-            rmse            : root mean square error
-            mape            : mean absolute percentage error
-            est             : predictions
-        '''
-        # Create the LSTM network
-        model = Sequential()
-        model.add(LSTM(units=lstm_units, return_sequences=True, input_shape=(x_train_scaled.shape[1], 1)))
-        model.add(Dropout(dropout_prob))  # Add dropout with a probability of 0.5
-        model.add(LSTM(units=lstm_units))
-        model.add(Dropout(dropout_prob))  # Add dropout with a probability of 0.5
-        model.add(Dense(1))
-
-        # Compile and fit the LSTM network
-        model.compile(loss='mean_squared_error', optimizer=optimizer)
-        model.fit(x_train_scaled, y_train_scaled, epochs=epochs, batch_size=batch_size, verbose=0)
-
-        # Do prediction
-        est_scaled = model.predict(x_cv_scaled)
-        est = (est_scaled * np.array(std_cv_list).reshape(-1, 1)) + np.array(mu_cv_list).reshape(-1, 1)
-
-        # Calculate RMSE and MAPE
-        #     print("x_cv_scaled = " + str(x_cv_scaled))
-        #     print("est_scaled = " + str(est_scaled))
-        #     print("est = " + str(est))
-        rmse = math.sqrt(mean_squared_error(y_cv, est))
-        mape = 1  # get_mape(y_cv, est)
-
-        return rmse, mape, est
-
     # Converting dataset into x_train and y_train
     def get_xy_train(self, debug, train, N):
         # Here we only scale the train dataset, and not the entire dataset to prevent information leak
@@ -208,4 +151,3 @@ class LTSM:
         model = self.create_network(x_train_scaled, y_train_scaled)
         est = self.predict(model, x_cv_scaled, std_cv_list, mu_cv_list, y_cv)
         self.draw_graph(est, y_cv, train, cv, test)
-
