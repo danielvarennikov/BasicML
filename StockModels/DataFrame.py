@@ -2,7 +2,7 @@ import pandas as pd
 
 
 class DataFrame:
-    stk_path = "./StockModels/AMD.csv"
+    stk_path = "./StockModels/StockDatasets/AMD.csv"
 
     # proportion of dataset to be used as test set
     test_size = 0.2

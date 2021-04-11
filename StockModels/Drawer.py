@@ -9,6 +9,7 @@ class Drawer:
         print("Please choose the desired stock:")
         print("1) Google")
         print("2) AMD")
+        print("3) VTI")
         return input()
 
     def prompt_model(self):
@@ -16,6 +17,8 @@ class Drawer:
         print("1) Moving average")
         print("2) Linear Regression")
         print("3) LTSM")
+        print("4) Decision Tree Regressor")
+        print("5) SVR")
         return input()
 
     # Show the splitting of the dataframe in a graphical manner
