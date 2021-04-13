@@ -2,7 +2,8 @@ import pandas as pd
 
 
 class DataFrame:
-    stk_path = "./StockModels/StockDatasets/AMD.csv"
+
+    stk_path = ""
 
     # proportion of dataset to be used as test set
     test_size = 0.2
@@ -10,7 +11,7 @@ class DataFrame:
     # proportion of dataset to be used as cross-validation set
     cv_size = 0.2
 
-    def read_data(self, path=stk_path):
+    def read_data(self, path):
         # Read the data
         df = pd.read_csv(path, sep=",")
 
@@ -39,7 +40,7 @@ class DataFrame:
             print("num_test = " + str(num_test))
         return num_cv, num_test, num_train
 
-    # Split into train, cv, and test
+    # Split into train, cv, and test according to the sizes we got
     def split_df(self, debug, dataframe, num_cv, num_train):
         train = dataframe[:num_train]
         cv = dataframe[num_train:num_train + num_cv]

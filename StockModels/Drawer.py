@@ -35,7 +35,7 @@ class Drawer:
         plt.title('Dataframe split')
         plt.show()
 
-    def graph_result(self, train, cv, test, Nmax):
+    def graph_result(self, train, cv, test, Nmax, RMSE = [], mape = []):
         NUM_COLORS = Nmax + 4
         cm = plt.get_cmap('gist_rainbow')
         rcParams['figure.figsize'] = 10, 8  # width 10, height 8
@@ -51,4 +51,5 @@ class Drawer:
         ax.legend(legend)
         ax.set_xlabel("date")
         ax.set_ylabel("USD")
+        plt.text(0.1, 0.3, 'mape: ', horizontalalignment='center', verticalalignment = 'baseline', transform = ax.transAxes)
         plt.show()
