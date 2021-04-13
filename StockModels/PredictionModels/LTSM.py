@@ -12,21 +12,38 @@ from keras.layers import Dense, Dropout, LSTM
 from tensorflow.python.framework.random_seed import set_random_seed
 
 
+# Split data into x (features) and y (target)
+# We scale x to have mean 0 and std dev 1, and return this.
+# We do not scale y here.
+# Inputs
+#    data     : pandas series to extract x and y
+#   N
+#   offset
+# Outputs
+#    x_scaled : features used to predict y. Scaled such that each element has mean 0 and std dev 1
+#   y        : target values. Not scaled
+#    mu_list  : list of the means. Same length as x_scaled and y
+#    std_list : list of the std devs. Same length as x_scaled and y
+
+
 class LTSM:
-    lstm_units = 50
-    dropout_prob = 0.9
-    optimizer = 'adam'
-    epochs = 1
-    batch_size = 1
 
-    model_seed = 100
+    def __init__(self):
+        self.lstm_units = 50
+        self.dropout_prob = 0.9
+        self.optimizer = 'adam'
+        self.epochs = 1
+        self.batch_size = 1
 
-    # Set seeds to ensure same output results
-    seed(101)
+        self.model_seed = 100
 
-    set_random_seed(model_seed)
+        # Set seeds to ensure same output results
+        seed(101)
 
-    def get_x_y(self,data, N, offset):
+        set_random_seed(self.model_seed)
+
+
+    def get_x_y(self, data, N, offset):
         """
         Split data into x (features) and y (target)
         """
@@ -40,20 +57,7 @@ class LTSM:
         return x, y
 
     def get_x_scaled_y(self, data, N, offset):
-        """
-        Split data into x (features) and y (target)
-        We scale x to have mean 0 and std dev 1, and return this.
-        We do not scale y here.
-        Inputs
-            data     : pandas series to extract x and y
-            N
-            offset
-        Outputs
-            x_scaled : features used to predict y. Scaled such that each element has mean 0 and std dev 1
-            y        : target values. Not scaled
-            mu_list  : list of the means. Same length as x_scaled and y
-            std_list : list of the std devs. Same length as x_scaled and y
-        """
+
         x_scaled, y, mu_list, std_list = [], [], [], []
         for i in range(offset, len(data)):
             mu_list.append(np.mean(data[i - N:i]))
@@ -84,8 +88,9 @@ class LTSM:
     # Scale the dataset
     def get_scaled_dataset(self, train_cv, N, num_train, debug):
         # Split into x and y
-        x_cv_scaled, y_cv, mu_cv_list, std_cv_list = self.get_x_scaled_y(np.array(train_cv['adj_close']).reshape(-1, 1), N,
-                                                                    num_train)
+        x_cv_scaled, y_cv, mu_cv_list, std_cv_list = self.get_x_scaled_y(np.array(train_cv['adj_close']).reshape(-1, 1),
+                                                                         N,
+                                                                         num_train)
         if debug:
             print("x_cv_scaled.shape = " + str(x_cv_scaled.shape))
             print("y_cv.shape = " + str(y_cv.shape))

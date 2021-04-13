@@ -13,17 +13,7 @@ class LinearRegressionClass:
         return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
     def get_preds_lin_reg(self, df, target_col, N, pred_min, offset):
-        """
-        Given a dataframe, get prediction at timestep t using values from t-1, t-2, ..., t-N.
-        Inputs
-            df         : dataframe with the values you want to predict. Can be of any length.
-            target_col : name of the column you want to predict e.g. 'adj_close'
-            N          : get prediction at timestep t using values from t-1, t-2, ..., t-N
-            pred_min   : all predictions should be >= pred_min
-            offset     : for df we only do predictions for df[offset:]. e.g. offset can be size of training set
-        Outputs
-            pred_list  : the predictions for target_col. np.array of length len(df)-offset.
-        """
+
         # Create linear regression object
         regr = LinearRegression(fit_intercept=True)
 
@@ -33,12 +23,6 @@ class LinearRegressionClass:
             X_train = np.array(range(len(df['adj_close'][i - N:i])))  # e.g. [0 1 2 3 4]
             y_train = np.array(df['adj_close'][i - N:i])  # e.g. [2944 3088 3226 3335 3436]
             X_train = X_train.reshape(-1, 1)  # e.g X_train =
-            # [[0]
-            #  [1]
-            #  [2]
-            #  [3]
-            #  [4]]
-            # X_train = np.c_[np.ones(N), X_train]              # add a column
             y_train = y_train.reshape(-1, 1)
 
             # Train the model
@@ -47,7 +31,7 @@ class LinearRegressionClass:
 
             pred_list.append(pred[0][0])  # Predict the footfall using the model
 
-        # If the values are < pred_min, set it to be pred_min
+        # If the values are < pred_min, set it to be pred_min (e.g. no need for negative values)
         pred_list = np.array(pred_list)
         pred_list[pred_list < pred_min] = pred_min
 
@@ -57,7 +41,9 @@ class LinearRegressionClass:
         RMSE = []
         R2 = []
         mape = []
-        for N in range(1, Nmax + 1):  # N is no. of samples to use to predict the next value
+
+        # N is no. of samples to use to predict the next value
+        for N in range(1, Nmax + 1):
             est_list = self.get_preds_lin_reg(train_cv, 'adj_close', N, 0, num_train)
 
             cv.loc[:, 'est' + '_N' + str(N)] = est_list
@@ -69,5 +55,5 @@ class LinearRegressionClass:
             print('R2 = ' + str(R2))
             print('MAPE = ' + str(mape))
 
-    def LinearRegression_runner(self, debug, train, test, cv, N, train_cv, num_train):
+    def LinearRegression_runner(self, debug, cv, N, train_cv, num_train):
         self.calculate_linear_regression(debug, train_cv, N, num_train, cv)
